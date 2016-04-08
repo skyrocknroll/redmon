@@ -25,3 +25,7 @@ Ex:
 `http://localhost:9736/sentinel/localhost:26379,localhost:26378/master`
 
 
+### Usage
+Add the url to any of the http enpoint monitoring tool ex: `pingdom` or `datadog` or `https://github.com/fzaninotto/uptime`
+
+The API will send `200` status in case of success otherwise will respond with `500` status code.
