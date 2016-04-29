@@ -1,7 +1,7 @@
 # redmon
 Monitor Redis & Sentinel(HA Redis) using any of the http based endpoint monitoring system.
 
-By default the server listens on endpoint `0.0.0.0:6379`
+By default the server listens on endpoint `0.0.0.0:9736`
 
 ## Example
 
