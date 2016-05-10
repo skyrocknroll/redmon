@@ -3,14 +3,14 @@
 package main
 
 import (
-	"gopkg.in/redis.v3"
-	"fmt"
-	"net/http"
-	"io"
-	"github.com/gorilla/mux"
-	"strings"
-	"log"
 	"flag"
+	"fmt"
+	"github.com/gorilla/mux"
+	"gopkg.in/redis.v3"
+	"io"
+	"log"
+	"net/http"
+	"strings"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func GetNewClient(Endpoint string) *redis.Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:     Endpoint,
 		Password: "", // no password set
-		DB:       0, // use default DB
+		DB:       0,  // use default DB
 	})
 
 	return client
@@ -44,8 +44,8 @@ func GetNewFailoverClient(MasterName string, SentinelAddrs []string) *redis.Clie
 	client := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    MasterName,
 		SentinelAddrs: SentinelAddrs,
-		Password: "", // no password set
-		DB:       0, // use default DB
+		Password:      "", // no password set
+		DB:            0,  // use default DB
 	})
 
 	return client
@@ -54,7 +54,7 @@ func GetNewFailoverClient(MasterName string, SentinelAddrs []string) *redis.Clie
 func RedisStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	client := GetNewClient(vars["endpoint"])
-	defer client.Close()   // Close the client.
+	defer client.Close() // Close the client.
 	data, err := client.Set("__||__", "Are You Up?", -1).Result()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -73,7 +73,7 @@ func RedisSentinelStatus(w http.ResponseWriter, r *http.Request) {
 	SentinelAddrs := strings.Split(vars["endpoint"], ",")
 	MasterName := vars["master"]
 	client := GetNewFailoverClient(MasterName, SentinelAddrs)
-	defer client.Close()   // Close the client.
+	defer client.Close() // Close the client.
 	data, err := client.Set("__||__", "Are You Up?", -1).Result()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
