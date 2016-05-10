@@ -59,7 +59,7 @@ func RedisStatus(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, err.Error())
-		//fmt.Println(err.Error())
+		fmt.Println(err.Error())
 
 	} else {
 		w.WriteHeader(http.StatusOK)
