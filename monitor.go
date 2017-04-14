@@ -18,6 +18,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/redis/{endpoint}", RedisStatus)
 	r.HandleFunc("/sentinel/{endpoint}/{master}", RedisSentinelStatus)
+	r.HandleFunc("/cluster/{nodeAddresses}", RedisClusterStatus)
 
 	fmt.Printf("Server listening on %s", *ListenEndpoint)
 	err := http.ListenAndServe(*ListenEndpoint, r)
@@ -51,6 +52,14 @@ func GetNewFailoverClient(MasterName string, SentinelAddrs []string) *redis.Clie
 	return client
 }
 
+func GetNewClusterClient(NodeAddresses []string) *redis.ClusterClient{
+	client := redis.NewClusterClient(&redis.ClusterOptions{
+		Addrs: NodeAddresses,
+		Password: "", // no password set
+	})
+	return client
+}
+
 func RedisStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	client := GetNewClient(vars["endpoint"])
@@ -79,6 +88,25 @@ func RedisSentinelStatus(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		io.WriteString(w, err.Error())
 		//fmt.Println(err.Error())
+
+	} else {
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, data)
+
+	}
+}
+
+func RedisClusterStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	NodeAddresses := strings.Split(vars["nodeAddresses"], ",")
+	client := GetNewClusterClient(NodeAddresses)
+	defer client.Close() // Close the client.
+	client.Ping()
+	data, err := client.Set("__||__", "Are You Up?", -1).Result()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(w, err.Error())
+		fmt.Println(err.Error())
 
 	} else {
 		w.WriteHeader(http.StatusOK)
